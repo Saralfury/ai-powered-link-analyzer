@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiteIntel — Website Link Analysis</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>SiteIntel</h1>
+    <p>AI-powered website link analysis. Get business, competitor, SEO, search-query, and target-audience insights from any public URL.</p>
+  </header>
+
+  <div class="card">
+    <h2>Analyse a Website</h2>
+    <div id="errorBox" class="error" style="display:none;"></div>
+    <div id="successBox" class="success" style="display:none;"></div>
+    <div class="form-row">
+      <input type="url" id="urlInput" placeholder="https://example.com" value="https://example.com">
+      <button id="analyseBtn">Analyse</button>
+    </div>
+    <div id="loader" class="loading" style="display:none;">Analysing website… fetching pages and running LLM. This may take several seconds.</div>
+  </div>
+
+  <div id="result" class="card" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:16px; flex-wrap:wrap;">
+      <div>
+        <h2>Results for <span id="resWebsite" style="font-weight:normal; color:#64748b;"></span></h2>
+        <span class="badge" id="resBrand"></span>
+      </div>
+      <div class="meta" id="resMeta"></div>
+    </div>
+
+    <p id="resBrandSummary" class="muted" style="margin-bottom:16px;"></p>
+
+    <section id="secCompetitor">
+      <h2>1. Competitor vs Your Brand</h2>
+      <p id="compOverview" class="muted"></p>
+      <div style="margin-bottom:8px;"><strong>Your brand's strengths:</strong></div>
+      <ul id="compStrengths"></ul>
+      <div style="margin-bottom:8px;"><strong>Opportunities to improve positioning:</strong></div>
+      <ul id="compOpportunities"></ul>
+      <h3>Identified Competitors</h3>
+      <table id="compTable">
+        <thead><tr><th>Competitor</th><th>Overview</th><th>Strengths</th><th>Weaknesses / Gaps</th><th>Source</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h3>Comparison Table</h3>
+      <table id="compComparison">
+        <thead><tr><th>Field</th><th>Your Brand</th><th>Competitor</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="secQueries">
+      <h2>2. Top 5 Target Search Queries</h2>
+      <table>
+        <thead><tr><th>Query</th><th>Platforms</th><th>Intent</th><th>Business Relevance</th><th>Target Audience</th></tr></thead>
+        <tbody id="queriesBody"></tbody>
+      </table>
+    </section>
+
+    <section id="secSeo">
+      <h2>3. SEO Improvements</h2>
+      <div class="grid-2">
+        <div>
+          <p><strong>Primary keyword:</strong> <span id="seoPrimary"></span></p>
+          <p><strong>Recommended title:</strong> <span id="seoTitle"></span></p>
+          <p><strong>Meta description:</strong> <span id="seoMeta"></span></p>
+        </div>
+        <div>
+          <p><strong>Secondary keywords:</strong></p>
+          <ul id="seoSecondary"></ul>
+          <p><strong>Long-tail keywords:</strong></p>
+          <ul id="seoLongtail"></ul>
+          <p><strong>Supporting content ideas:</strong></p>
+          <ul id="seoContent"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="secServices">
+      <h2>4. Top 5 Services</h2>
+      <table>
+        <thead><tr><th>Service</th><th>Description</th><th>Target Industry</th><th>Target Customer</th><th>Main Benefit</th><th>Source</th></tr></thead>
+        <tbody id="servicesBody"></tbody>
+      </table>
+    </section>
+
+    <section id="secAudience">
+      <h2>5. Target Audience</h2>
+      <div class="grid-2">
+        <div>
+          <p><strong>Primary audience:</strong></p>
+          <ul id="audPrimary"></ul>
+          <p><strong>Industry segments:</strong></p>
+          <ul id="audIndustries"></ul>
+          <p><strong>Customer needs:</strong></p>
+          <ul id="audNeeds"></ul>
+        </div>
+        <div>
+          <p><strong>Secondary audience:</strong></p>
+          <ul id="audSecondary"></ul>
+          <p><strong>Business types:</strong></p>
+          <ul id="audBusiness"></ul>
+          <p><strong>Customer challenges:</strong></p>
+          <ul id="audChallenges"></ul>
+        </div>
+      </div>
+      <p id="audLocation" class="muted"></p>
+    </section>
+
+    <div id="resDisclaimer" class="disclaimer"></div>
+
+    <details>
+      <summary>Raw JSON response</summary>
+      <pre id="rawJson"></pre>
+    </details>
+  </div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>

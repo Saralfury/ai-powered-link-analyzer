@@ -1,0 +1,263 @@
+{
+  "success": true,
+  "website": "https://example.com/",
+  "brand": {
+    "name": "Example Domain",
+    "category": "Technology Services",
+    "summary": "This domain is for use in documentation examples without needing permission."
+  },
+  "analysis": {
+    "competitor_analysis": {
+      "brand_overview": "This domain is for use in documentation examples without needing permission.",
+      "competitors": [
+        {
+          "name": "Competitor A",
+          "overview": "Established player in the same category.",
+          "strengths": [
+            "Brand recognition",
+            "Wide service range"
+          ],
+          "weaknesses_or_gaps": [
+            "Higher pricing",
+            "Slower support"
+          ],
+          "ai_suggested": true,
+          "source": "llm",
+          "source_urls": null
+        },
+        {
+          "name": "Competitor B",
+          "overview": "Growing challenger focused on digital solutions.",
+          "strengths": [
+            "Modern tech stack",
+            "Agile delivery"
+          ],
+          "weaknesses_or_gaps": [
+            "Smaller team",
+            "Limited case studies"
+          ],
+          "ai_suggested": true,
+          "source": "llm",
+          "source_urls": null
+        },
+        {
+          "name": "Competitor C",
+          "overview": "Local/regional service provider.",
+          "strengths": [
+            "Local presence",
+            "Personalized service"
+          ],
+          "weaknesses_or_gaps": [
+            "Limited scale",
+            "Basic online presence"
+          ],
+          "ai_suggested": true,
+          "source": "llm",
+          "source_urls": null
+        }
+      ],
+      "comparison_table": [],
+      "strengths": [
+        "Focused service offering"
+      ],
+      "opportunities": [
+        "Improve online visibility"
+      ]
+    },
+    "target_search_queries": [
+      {
+        "query": "Best Technology Services company",
+        "platforms": [
+          "Google",
+          "LinkedIn"
+        ],
+        "intent": "Service Discovery",
+        "business_relevance": "Direct match for Technology Services.",
+        "target_audience": "Businesses seeking service providers",
+        "search_volume": null
+      },
+      {
+        "query": "Technology Services services",
+        "platforms": [
+          "Facebook",
+          "Instagram"
+        ],
+        "intent": "Business Discovery",
+        "business_relevance": "Broad service-category awareness.",
+        "target_audience": "Small businesses and startups",
+        "search_volume": null
+      },
+      {
+        "query": "Technology Services ideas",
+        "platforms": [
+          "Instagram"
+        ],
+        "intent": "Inspiration",
+        "business_relevance": "Top-of-funnel design/idea traffic.",
+        "target_audience": "Creative and business decision-makers",
+        "search_volume": null
+      },
+      {
+        "query": "Technology Services for startups",
+        "platforms": [
+          "LinkedIn"
+        ],
+        "intent": "B2B Search",
+        "business_relevance": "Targets early-stage companies.",
+        "target_audience": "Startup founders and CTOs",
+        "search_volume": null
+      },
+      {
+        "query": "affordable Technology Services",
+        "platforms": [
+          "X"
+        ],
+        "intent": "Service Discovery",
+        "business_relevance": "Price-sensitive demand signal.",
+        "target_audience": "SMBs and budget-conscious buyers",
+        "search_volume": null
+      }
+    ],
+    "seo_improvements": {
+      "primary_keyword": "Technology Services",
+      "secondary_keywords": [
+        "Technology Services company",
+        "Technology Services services",
+        "digital solutions"
+      ],
+      "long_tail_keywords": [
+        "affordable Technology Services for small business",
+        "best Technology Services provider",
+        "Technology Services consultation"
+      ],
+      "relevant_business_keywords": [
+        "Technology Services"
+      ],
+      "recommended_title": "Example Domain | Professional Technology Services",
+      "primary_keyword_in_title": "Technology Services",
+      "improved_title_structure": "Brand + Primary Keyword + Value Proposition",
+      "meta_description": "This domain is for use in documentation examples without needing permission.",
+      "supporting_content": [
+        "Service landing pages for each core offering",
+        "Industry-specific solution pages",
+        "Frequently Asked Questions (FAQ)",
+        "Blog topics addressing customer challenges",
+        "Location-based landing pages (if relevant)"
+      ]
+    },
+    "top_services": [
+      {
+        "service_name": "Website Development",
+        "description": "Professional website development tailored to client needs.",
+        "target_industry": "General business",
+        "target_customer": "Small and medium businesses",
+        "main_benefit": "Improves online presence and operational efficiency.",
+        "inferred": true,
+        "source": "llm",
+        "evidence": null
+      },
+      {
+        "service_name": "UI/UX Design",
+        "description": "Professional ui/ux design tailored to client needs.",
+        "target_industry": "General business",
+        "target_customer": "Small and medium businesses",
+        "main_benefit": "Improves online presence and operational efficiency.",
+        "inferred": true,
+        "source": "llm",
+        "evidence": null
+      },
+      {
+        "service_name": "SEO & Digital Marketing",
+        "description": "Professional seo & digital marketing tailored to client needs.",
+        "target_industry": "General business",
+        "target_customer": "Small and medium businesses",
+        "main_benefit": "Improves online presence and operational efficiency.",
+        "inferred": true,
+        "source": "llm",
+        "evidence": null
+      },
+      {
+        "service_name": "Custom Software Development",
+        "description": "Professional custom software development tailored to client needs.",
+        "target_industry": "General business",
+        "target_customer": "Small and medium businesses",
+        "main_benefit": "Improves online presence and operational efficiency.",
+        "inferred": true,
+        "source": "llm",
+        "evidence": null
+      },
+      {
+        "service_name": "E-commerce Solutions",
+        "description": "Professional e-commerce solutions tailored to client needs.",
+        "target_industry": "General business",
+        "target_customer": "Small and medium businesses",
+        "main_benefit": "Improves online presence and operational efficiency.",
+        "inferred": true,
+        "source": "llm",
+        "evidence": null
+      }
+    ],
+    "target_audience": {
+      "primary_audience": [
+        "Small businesses",
+        "Startups"
+      ],
+      "secondary_audience": [
+        "Enterprise companies",
+        "Professional services"
+      ],
+      "industry_segments": [
+        "Technology",
+        "Professional services",
+        "Retail"
+      ],
+      "business_types": [
+        "SMB",
+        "Startup",
+        "Agency"
+      ],
+      "customer_profiles": [
+        "Business owner",
+        "Marketing manager",
+        "CTO"
+      ],
+      "location_focus": "",
+      "customer_needs": [
+        "Website development",
+        "Digital presence",
+        "SEO"
+      ],
+      "customer_challenges": [
+        "Low online visibility",
+        "Outdated website"
+      ],
+      "customer_interests": [
+        "Growth",
+        "Lead generation",
+        "Branding"
+      ],
+      "recommended_segments": [
+        "Small businesses needing a website",
+        "Startups needing digital solutions"
+      ]
+    }
+  },
+  "meta": {
+    "model": "mock-llm",
+    "provider": "mock",
+    "pages_analyzed": 1,
+    "input_tokens": 67,
+    "output_tokens": 1386,
+    "estimated_cost_usd": null,
+    "latency_ms": 50.0,
+    "cached": false,
+    "notes": [
+      "Page content is thin; results may be less specific."
+    ]
+  },
+  "data_sources": [
+    "website",
+    "llm"
+  ],
+  "disclaimer": "Competitor and audience insights marked as inferred or ai_suggested are AI-generated suggestions. Search query volumes are not reported."
+}
