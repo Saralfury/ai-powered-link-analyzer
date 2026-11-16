@@ -1,117 +1,143 @@
-# SiteIntel — AI-Powered Website Link Analysis API
+# AI-Powered Website Link Analysis API
 
-FastAPI application that analyses a public website URL using an LLM and returns
-structured business, competitor, SEO, search-query, service, and target-audience
-insights in five sections, plus metadata, provenance labels, and a comparison
-table.
+A FastAPI application that analyzes a public website URL and returns structured
+business, competitor, SEO, search-query, service, and target-audience insights.
 
-**Stack:** Python 3.x · FastAPI · Uvicorn · Pydantic · HTTPX · BeautifulSoup ·
-OpenAI (configurable) · dotenv
+The application extracts website content with HTTPX and BeautifulSoup, analyzes
+it using a configurable LLM provider (OpenAI, Anthropic, Gemini, or a built-in
+mock for demonstration), and returns all findings as validated JSON.
 
 **Endpoint:** `POST http://localhost:4000/link-analysis`  
-**Frontend:** `http://localhost:4000/`  
-**Docs:** `http://localhost:4000/docs`  
-**Health:** `http://localhost:4000/health`
+**Interactive docs:** `http://localhost:4000/docs`  
+**Health check:** `http://localhost:4000/health`
 
 ---
 
-## Repository structure
+## What it does
+
+**Input:** A public website URL (e.g., `https://example.com`).
+
+**Process:**
+1. Validates the URL and blocks private/loopback addresses (SSRF protection).
+2. Fetches the homepage and up to three relevant same-domain pages.
+3. Extracts title, meta tags, Open Graph data, headings, JSON-LD, text, and links.
+4. Runs a deterministic SEO audit (title length, H1 count, image alt ratio,
+   canonical, viewport, internal links).
+5. Sends cleaned content to an LLM provider for analysis.
+6. Validates the LLM response against Pydantic schemas, with one repair retry.
+7. Returns structured JSON across five sections.
+
+**Output:** Five analysis sections:
+
+1. **Competitor vs Your Brand** — brand overview, identified competitors,
+   strengths, weaknesses/opportunities, and a comparison table.
+2. **Top 5 Target Search Queries** — platform-aware queries for Google,
+   Facebook, Instagram, LinkedIn, and X with intent and audience.
+3. **SEO Improvements** — primary/secondary/long-tail keywords, recommended
+   title, meta description, and supporting content ideas.
+4. **Top 5 Services** — service name, description, target industry/customer,
+   and main benefit (with `inferred` flags for AI-suggested items).
+5. **Target Audience** — primary/secondary audiences, industries, business
+   types, customer profiles, needs, challenges, and interests.
+
+---
+
+## Project structure
 
 ```
-ai-link-analysis/
+ai-powered-link-analyzer/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py                # FastAPI app, /health, POST /link-analysis, error handling, rate limiter
+│   ├── main.py                # FastAPI app, /health, POST /link-analysis
 │   ├── config.py              # Pydantic-settings config (.env)
 │   ├── errors.py              # Custom exceptions + HTTP status mapping
-│   ├── schemas.py             # Request / response Pydantic models (exact brief contract)
-│   ├── static/                # (mounted) served frontend assets
+│   ├── schemas.py             # Request/response Pydantic models
 │   ├── services/
-│   │   ├── __init__.py
-│   │   ├── website_extractor.py   # HTTPX fetch + BeautifulSoup + multi-page discovery
-│   │   ├── website_audit.py       # Deterministic SEO audit (title, meta, H1, images, canonical, viewport, links)
-│   │   ├── llm_service.py         # OpenAI + Mock LLM, structured JSON, retry, fallback
-│   │   ├── analysis_service.py    # Orchestrates validate → extract → audit → LLM → validate → respond
-│   │   ├── competitor_service.py  # Registrable-domain dedup, self-rejection, ai_suggested labels
-│   │   └── scoring.py             # Opportunity scoring: impact × confidence / effort
+│   │   ├── website_extractor.py   # HTTPX fetch + BeautifulSoup extraction
+│   │   ├── website_audit.py       # Deterministic SEO audit
+│   │   ├── llm_service.py         # OpenAI / Anthropic / Gemini / Mock
+│   │   ├── analysis_service.py    # Pipeline orchestration
+│   │   └── competitor_service.py  # Competitor dedup / self-rejection
+│   │   └── scoring.py             # Opportunity scoring
 │   └── utils/
-│       └── validators.py          # URL validation + SSRF protection (ports 80/443, DNS, global-routability)
+│       └── validators.py          # URL validation + SSRF protection
 ├── frontend/
-│   ├── index.html               # Plain HTML5 frontend
-│   ├── styles.css               # Vanilla CSS3
-│   └── app.js                   # Vanilla JavaScript (fetch API, AbortController)
+│   ├── index.html               # Frontend UI (served at /)
+│   ├── styles.css               # Vanilla CSS
+│   └── app.js                   # Vanilla JavaScript (fetch API)
 ├── examples/
-│   └── sample-response.json     # Real API response against https://example.com
+│   └── sample-response.json     # Example API response
 ├── scripts/
-│   └── benchmark_llms.py        # LLM provider benchmark (measured vs documented)
+│   └── benchmark_llms.py        # LLM provider benchmark script
 ├── tests/
-│   └── test_link_analysis.py    # 36 tests (mocks, no network/keys)
+│   └── test_link_analysis.py    # 36 tests (mocked, no network/keys)
 ├── docs/
-│   ├── benchmarks/              # Benchmark results + README
-│   ├── sample_responses/        # Committed API response examples
-│   └── screenshots/             # Frontend verification notes
-├── .github/workflows/test.yml   # CI: pytest on push/PR
-├── Dockerfile                   # Containerised run
-├── .env.example                 # Copy to .env, add keys (placeholders only)
+│   ├── benchmarks/              # Benchmark results
+│   ├── sample_responses/        # Example responses
+│   └── screenshots/             # UI verification notes
+├── .env.example                 # Environment variable template
 ├── .gitignore
-├── pytest.ini
-├── requirements.txt
+├── Dockerfile                   # Container build
+├── pytest.ini                   # Pytest configuration
+├── requirements.txt             # Pinned dependencies
 └── README.md
 ```
 
 ---
 
-## Setup & execution
+## Setup
 
 ### Prerequisites
-* Python 3.9+
-* `pip` / `venv`
+Python 3.10+, `pip`, `venv`.
 
 ### Install
 
 ```bash
-cd ai-link-analysis
+git clone https://github.com/Saralfury/ai-powered-link-analyzer.git
+cd ai-powered-link-analyzer
+
 python -m venv .venv
 # Windows (PowerShell):
 .venv\Scripts\Activate.ps1
 # macOS / Linux:
 source .venv/bin/activate
+
 pip install -r requirements.txt
 cp .env.example .env
-# Edit .env and add your LLM API key(s).
-# Leave USE_MOCK_LLM=true to run without any key (deterministic demo mode).
 ```
 
-### Run the server
+Edit `.env` and add your LLM API key if you want live provider mode.
+Leave `USE_MOCK_LLM=true` to run in deterministic demonstration mode without any
+API key.
+
+### Run
 
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 4000
 ```
 
-* Frontend UI: http://localhost:4000/
-* API docs (Swagger): http://localhost:4000/docs
-* Health check: http://localhost:4000/health
+Visit `http://localhost:4000/` for the frontend UI or
+`http://localhost:4000/docs` for the Swagger API documentation.
 
-### Run with Docker
+### Docker
 
 ```bash
 docker build -t ai-link-analysis .
 docker run -p 4000:4000 --env-file .env ai-link-analysis
 ```
 
-### Run tests
+### Tests
 
 ```bash
 pytest -q
 ```
 
-No API key or network access is required (extractor and LLM are mocked).
+All tests use mocks and require no network access or LLM API keys.
 
 ---
 
-## API usage
+## API
 
-### Request
+### POST /link-analysis
 
 ```http
 POST http://localhost:4000/link-analysis
@@ -122,7 +148,7 @@ Content-Type: application/json
 }
 ```
 
-### Response (exact contract from the brief)
+### Example response
 
 ```json
 {
@@ -131,7 +157,7 @@ Content-Type: application/json
   "brand": {
     "name": "Example Domain",
     "category": "Technology Services",
-    "summary": "…"
+    "summary": "This domain is for use in documentation examples."
   },
   "analysis": {
     "competitor_analysis": {
@@ -139,242 +165,216 @@ Content-Type: application/json
       "competitors": [
         {
           "name": "Competitor A",
-          "overview": "…",
-          "strengths": ["…"],
-          "weaknesses_or_gaps": ["…"],
+          "overview": "Established player in the same category.",
+          "strengths": ["Brand recognition", "Wide service range"],
+          "weaknesses_or_gaps": ["Higher pricing", "Slower support"],
           "ai_suggested": true,
           "source": "llm"
         }
       ],
       "comparison_table": [
-        {"field": "Brand Name", "your_brand": "…", "competitor": "…"},
-        {"field": "Main Service", "your_brand": "…", "competitor": "…"}
+        {"field": "Brand Name", "your_brand": "Example Domain", "competitor": "Competitor A"}
       ],
-      "strengths": ["…"],
-      "opportunities": ["…"]
+      "strengths": ["Focused service offering"],
+      "opportunities": ["Improve online visibility through SEO"]
     },
     "target_search_queries": [
-      {"query": "…", "platforms": ["Google", "LinkedIn"], "intent": "Service Discovery", "business_relevance": "…", "target_audience": "…", "search_volume": null}
+      {
+        "query": "Best Technology Services company",
+        "platforms": ["Google", "LinkedIn"],
+        "intent": "Service Discovery",
+        "business_relevance": "…",
+        "target_audience": "…",
+        "search_volume": null
+      }
     ],
     "seo_improvements": {
-      "primary_keyword": "…",
-      "secondary_keywords": ["…"],
-      "long_tail_keywords": ["…"],
-      "relevant_business_keywords": ["…"],
-      "recommended_title": "…",
+      "primary_keyword": "Technology Services",
+      "secondary_keywords": ["Technology Services company"],
+      "long_tail_keywords": ["affordable Technology Services for small business"],
+      "relevant_business_keywords": ["Technology Services"],
+      "recommended_title": "Example Domain | Professional Technology Services",
       "meta_description": "…",
-      "supporting_content": ["…"]
+      "supporting_content": ["Service landing pages", "FAQ", "Blog topics"]
     },
     "top_services": [
-      {"service_name": "…", "description": "…", "target_industry": "…", "target_customer": "…", "main_benefit": "…", "inferred": false, "source": "website"}
+      {
+        "service_name": "Web Development",
+        "description": "Professional web development tailored to client needs.",
+        "target_industry": "General business",
+        "target_customer": "Small and medium businesses",
+        "main_benefit": "Improves online presence and operational efficiency.",
+        "inferred": false,
+        "source": "website"
+      }
     ],
     "target_audience": {
-      "primary_audience": ["…"],
-      "customer_needs": ["…"]
+      "primary_audience": ["Small businesses", "Startups"],
+      "secondary_audience": ["Enterprise companies"],
+      "industry_segments": ["Technology", "Professional services"],
+      "business_types": ["SMB", "Startup"],
+      "customer_profiles": ["Business owner", "Marketing manager"],
+      "location_focus": "",
+      "customer_needs": ["Website development", "Digital presence"],
+      "customer_challenges": ["Low online visibility"],
+      "customer_interests": ["Growth", "Lead generation"],
+      "recommended_segments": ["Small businesses needing a website"]
     }
   },
   "meta": {
     "model": "mock-llm",
     "provider": "mock",
     "pages_analyzed": 1,
-    "input_tokens": 123,
-    "output_tokens": 456,
+    "input_tokens": 111,
+    "output_tokens": 1378,
     "estimated_cost_usd": null,
-    "latency_ms": 50.0,
+    "latency_ms": 0.2,
     "cached": false,
     "notes": []
   },
   "data_sources": ["website", "llm"],
-  "disclaimer": "…"
+  "disclaimer": "Competitor and audience insights marked as inferred or ai_suggested are AI-generated suggestions. Search query volumes are not reported."
 }
 ```
 
-A complete committed example is in `examples/sample-response.json`.
+A complete committed example is available in `examples/sample-response.json`.
 
-### Error responses
-
-All errors use a consistent envelope:
-
-```json
-{
-  "success": false,
-  "website": "http://127.0.0.1/",
-  "error": {"code": "BLOCKED_DESTINATION", "message": "Access to internal address 127.0.0.1 is not allowed."},
-  "detail": null
-}
-```
+### Error handling
 
 | Condition | HTTP status | Error code |
 |-----------|-------------|------------|
-| Malformed URL / unsupported scheme | 422 | INVALID_URL |
-| Private / loopback / link-local / blocked destination | 400 | BLOCKED_DESTINATION |
-| Website timeout / unreachable / non-HTML / fetch failure | 502 | EXTRACTION_FAILED |
-| LLM failure after repair/fallback | 502 | LLM_FAILED |
-| Request validation failure | 422 | VALIDATION_ERROR |
-| Unexpected internal failure | 500 | INTERNAL_ERROR |
+| Malformed URL / unsupported scheme | 422 | `INVALID_URL` |
+| Private / loopback / blocked destination | 400 | `BLOCKED_DESTINATION` |
+| Website unreachable / non-HTML / fetch failure | 502 | `EXTRACTION_FAILED` |
+| LLM failure after retry/fallback | 502 | `LLM_FAILED` |
+| Request validation failure | 422 | `VALIDATION_ERROR` |
+| Unexpected internal failure | 500 | `INTERNAL_ERROR` |
 
 ---
 
-## Frontend
+## Architecture
 
-A lightweight frontend (plain HTML5, CSS3, vanilla JavaScript — no frameworks,
-no build tooling) is served at `http://localhost:4000/`. It:
-
-* Accepts a URL and calls `POST /link-analysis`
-* Shows a loading state and disables the button during the request
-* Renders all five sections plus the comparison table
-* Displays metadata (provider/model, pages analysed, latency, token usage, cache status)
-* Shows provenance labels (`ai_suggested`, `inferred`) on competitors and services
-* Uses `textContent` for safe rendering (no `innerHTML` of untrusted content)
-* Has a 120-second client-side timeout (AbortController)
-* Is responsive for desktop and mobile
-
----
-
-## Data integrity & provenance
-
-Source labels used throughout:
-
-| Label | Meaning |
-|-------|---------|
-| `observed` | Directly supported by extracted website content (with page URL + snippet) |
-| `inferred` | Reasoned conclusion from website evidence |
-| `ai_suggested` | Model-generated suggestion or hypothesis |
-
-Rules:
-* Exactly 5 target search queries returned on success (search volume is `null`)
-* At least 3 competitors only where reliable information exists
-* Default competitor source is `ai_suggested`
-* The submitted website is rejected as its own competitor
-* Competitors are deduplicated by registrable domain
-* `search_volume` is always `null` (no real search-volume data source connected)
-
----
-
-## LLM model research & benchmark
-
-### Provider comparison (documented pricing + measured latency)
-
-| Provider | Model | API cost (per 1M in/out) | Response speed | JSON support | Label |
-|----------|-------|-------------------------|----------------|--------------|-------|
-| OpenAI | gpt-4o-mini | $0.15 / $0.60 (documented) | Fast (~2–6 s measured) | Native `response_format={json_object}` | Primary |
-| OpenAI | gpt-3.5-turbo | $0.50 / $1.50 (documented) | Fast | Native JSON mode | Fallback |
-| Mock | mock-llm | Free | ~50 ms (measured) | Valid JSON | Demo / CI |
-
-### Recommended model
-
-**OpenAI `gpt-4o-mini`** — best balance of accuracy, native JSON output, low
-latency, and low cost. Fallback: `gpt-3.5-turbo`.
-
-Estimated cost per analysis: ~$0.001–$0.006 (documented pricing, estimated).
-Measured latency with mock: ~50 ms.
-
-Run the benchmark:
-
-```bash
-python scripts/benchmark_llms.py
+```text
+URL input
+    │
+    ▼
+URL validation + SSRF protection
+    │
+    ▼
+Website extraction (homepage + up to 3 internal pages)
+    │
+    ▼
+Deterministic SEO audit
+    │
+    ▼
+LLM analysis (provider-agnostic, structured JSON)
+    │
+    ▼
+Pydantic schema validation + evidence verification
+    │
+    ▼
+Structured JSON response
 ```
 
-Results are committed under `docs/benchmarks/` when available. All values are
-labeled **measured** (from actual runs) or **documented** (from public pricing
-pages). No estimates are presented as measured.
-
----
-
-## Cost controls implemented
-
-1. Content cleaning before LLM: scripts, styles, nav, footer, comments stripped
-2. Token truncation: `MAX_CONTENT_CHARS` (12,000) per page, `MAX_TOTAL_CHARS` (20,000) across pages
-3. Single LLM call generates all five sections in one JSON object
-4. In-memory TTL cache keyed by normalised URL + content hash (`meta.cached = true` on hit)
-5. Cache capped at 100 entries (FIFO eviction)
-6. No invented search volumes — no separate data-source API calls
-7. Mock provider for CI/demo runs with zero API cost
+### Key design decisions
+* **Single LLM call:** All five sections are generated in one structured JSON
+  response to minimize latency and API cost.
+* **Provider-agnostic LLM:** The same pipeline works with OpenAI, Anthropic,
+  Gemini, or a deterministic mock for testing/demonstration.
+* **Provenance labels:** Every competitor and service carries `ai_suggested`
+  or `inferred` flags so reviewers can distinguish extracted data from
+  AI-generated suggestions.
+* **No invented data:** Search query volumes are always `null`; competitors
+  are clearly labeled as AI-suggested unless found on the website.
 
 ---
 
 ## Security
 
-* **SSRF protection:** Only HTTP/HTTPS on ports 80/443. Localhost, private IPs
-  (10.x, 172.16–31.x, 192.168.x), loopback, link-local (169.254.x including AWS
-  metadata), multicast, reserved, unspecified, IPv4-mapped IPv6, and carrier-grade
-  NAT are rejected. DNS resolution inspects every returned address.
-* **Redirect safety:** Automatic redirect following disabled; up to 5 manual hops,
-  each fully re-validated.
-* **No credentials exposed:** API keys come from environment variables only.
+* **SSRF protection:** Only `http://` and `https://` on ports 80 and 443 are
+  accepted. Private, loopback, link-local, multicast, reserved, and
+  unspecified addresses are rejected via `ipaddress` checks and DNS
+  resolution.
+* **Redirect safety:** Automatic redirect following is disabled; up to five
+  manual hops are each re-validated.
+* **Credential management:** API keys are loaded from environment variables
+  via `pydantic-settings`. `.env` is gitignored; `.env.example` contains
+  placeholders only.
 * **Prompt-injection defence:** Website content is delimited and treated as
-  untrusted data; the model is instructed to ignore embedded instructions.
+  untrusted data; the system prompt instructs the model to ignore embedded
+  instructions.
 
 ---
 
-## V2 mandatory controls
+## LLM model research
 
-* **Evidence verification:** After the LLM call, Python verifies that each
-  `observed` claim's snippet (whitespace/case-normalised) actually appears in
-  the text of the referenced fetched page. Claims that fail verification are
-  downgraded to `inferred` with a note in `meta.notes` — never silently kept
-  as `observed`. Covered by a dedicated test.
-* **Pipeline budget:** The entire fetch → extract → audit → LLM → validate
-  chain is wrapped in a single `asyncio.wait_for(90s)`. A budget breach maps
-  to `502` with error code `UPSTREAM_TIMEOUT`. Covered by a dedicated test.
-* **Cache hardening:** In-memory TTL cache with a FIFO cap of 100 entries. On
-  a cache hit, recorded tokens/cost/latency are replayed and `meta.cached` is
-  set to `true` — nothing is re-measured or re-billed. Cache key is the
-  normalised URL plus a content hash of extracted content (not URL alone).
-  Covered by a dedicated test.
+Benchmark results are recorded in `docs/benchmarks/benchmark-results.json`.
+
+**Measured results (mock provider, deterministic demo mode):**
+
+| Provider | Model | Latency | Input tokens | Output tokens | JSON valid | Label |
+|----------|-------|---------|--------------|---------------|------------|-------|
+| Mock | mock-llm | 0.2 ms | 111 | 1,378 | Yes | measured |
+
+OpenAI, Anthropic, and Gemini providers are implemented but were not tested
+with live API keys during this submission; their results are labeled
+`not_tested` and documented pricing is used for cost estimates only.
+
+**Recommended model:** OpenAI `gpt-4o-mini`, based on its native JSON mode,
+low latency, and competitive per-token pricing. Fallback: `gpt-3.5-turbo`.
+Estimated cost per analysis is under $0.01 in most cases (documented pricing,
+not measured).
 
 ---
 
-## Tests
+## Cost optimization
 
-36 tests cover URL validation, SSRF protection, extraction, SEO audit, scoring,
-competitor dedup/self-rejection, evidence verification, pipeline budget,
-cache key behaviour, endpoint contract, and end-to-end pipeline with mock LLM.
-No live LLM or network calls required.
+* HTML is cleaned (scripts, styles, nav, footer removed) before being sent to
+  the LLM.
+* Page text is truncated to stay within token and cost budgets.
+* A single LLM call generates all five sections, avoiding repeated API calls.
+* Results are cached in memory (100-entry FIFO cap) keyed by normalized URL
+  plus content hash; cache hits replay recorded metadata without re-billing.
+* No search-volume or ranking data sources are called, eliminating extra API
+  costs.
+
+---
+
+## Testing
+
+36 tests cover URL validation, SSRF protection, extraction, SEO audit,
+scoring, competitor deduplication, self-rejection, evidence verification,
+pipeline budget enforcement, cache key behavior, endpoint contract, and
+end-to-end pipeline behavior with the mock LLM. No live LLM or network calls
+are required.
 
 ```bash
 pytest -q
 ```
 
-CI runs on every push/PR via GitHub Actions.
+Continuous integration runs on every push/pull request via GitHub Actions.
 
 ---
 
 ## Limitations
 
-* JavaScript-rendered (SPA) sites may yield thin content; a `meta.notes` warning
-  is added. Playwright integration is future work.
-* Competitor information is AI-generated unless found on the site; every
-  competitor carries `ai_suggested` / `source` labels.
-* Search-query volumes are **not** reported (per the brief: no invented data).
-* Benchmark latency figures are measured from limited runs; accuracy ratings are
-  qualitative estimates.
-* Residual DNS-rebinding risk remains with the fallback validation approach
-  (documented, not claimed as complete protection).
+* JavaScript-rendered (SPA) sites may yield thin content; a warning is added
+  to `meta.notes`. Browser automation (e.g., Playwright) is future work.
+* Competitor information is AI-generated unless it appears verbatim on the
+  submitted site; every competitor carries `ai_suggested` / `source` labels.
+* Search-query volumes are intentionally not reported.
+* Benchmark results are based on limited runs; accuracy ratings are
+  qualitative estimates, not formal benchmark scores.
+* Residual DNS-rebinding risk remains with the fallback redirect-validation
+  approach and is documented rather than claimed as eliminated.
 
 ---
 
-## Application verification (mandatory)
+## Repository verification
 
-Per the recruitment instructions:
-
-1. Follow **Dxora Technologies** on LinkedIn:
-   https://www.linkedin.com/company/dxora-technologies
-2. Follow **CREST** on Instagram:
-   https://www.instagram.com/crestspot/
-
-Share your LinkedIn and Instagram profile links when submitting your application.
-
----
-
-## Final submission — email
-
-* **To:** hr@chivoxai.com
-* **Subject:** Your Name - Python Practical test review
-* **Body:** Full name, public GitHub repository link, contact number,
-  current location, preferred date and time for final discussion, and your
-  LinkedIn / Instagram profile links.
-* **Deadline:** 22nd November 2026
-
-Repository must be **public** and include this README with setup instructions,
-sample requests/responses, and the LLM comparison above.
+* Public repository: `https://github.com/Saralfury/ai-powered-link-analyzer`
+* Required run command: `uvicorn app.main:app --host 0.0.0.0 --port 4000`
+* Swagger UI: `http://localhost:4000/docs`
+* Health endpoint: `http://localhost:4000/health`
+* No API keys or secrets are committed.
+* Dependencies are pinned in `requirements.txt`.
